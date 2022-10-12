@@ -4,6 +4,7 @@ from re import S
 from xmlrpc.client import Boolean
 import pygame
 import numpy as np
+import math
 import sys
 
 #-----------------------------------------------------------------------------------------------------------------------------------------
@@ -107,35 +108,37 @@ def run():
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 print(event.pos)
-                pass
-                # #Turno jugador 1
-                # if turn == 0:
-                #     col = int(input('Jugador 1 indique su jugada: '))
-                #     if is_valid_location(board,col):
-                #         row = get_next_open_row(board,col)
-                #         drop_piece(board,row,col,1)
-                #         if(winning_move(board,1)):
-                #             print("jUGADOR 1 GANO")
-                #             game_over = True
+                
+                #Turno jugador 1
+                if turn == 0:
+                    posX = event.pos[0]
+                    col = int(math.floor(posX/SQUARESIZE))
+                    if is_valid_location(board,col):
+                        row = get_next_open_row(board,col)
+                        drop_piece(board,row,col,1)
+                        if(winning_move(board,1)):
+                            print("jUGADOR 1 GANO")
+                            game_over = True
 
-                #     print_board(board)
-                #     turn +=1
+                    print_board(board)
+                    turn +=1
 
 
-                # #Turno jugador 2
-                # else:
-                #     col = int(input('Jugador 2 indique su jugada: '))
+                #Turno jugador 2
+                else:
+                    posX=event.pos[0]
+                    col = int(math.floor(posX/SQUARESIZE))
 
-                #     if is_valid_location(board,col):
-                #         row = get_next_open_row(board,col)
-                #         drop_piece(board,row,col,2)
-                #         if(winning_move(board,2)):
-                #             print("jUGADOR 2 GANO")
-                #             game_over = True
+                    if is_valid_location(board,col):
+                        row = get_next_open_row(board,col)
+                        drop_piece(board,row,col,2)
+                        if(winning_move(board,2)):
+                            print("jUGADOR 2 GANO")
+                            game_over = True
             
-                #     print_board(board)
-                #     turn +=1
-                #     turn = turn %2
+                    print_board(board)
+                    turn +=1
+                    turn = turn %2
         
             
 
