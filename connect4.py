@@ -1,4 +1,5 @@
 #MARK: - IMPORTS
+from ast import With
 from lib2to3 import pygram
 from re import S
 from xmlrpc.client import Boolean
@@ -14,6 +15,8 @@ ROW_COUNT = 6
 COLUMN_COUNT = 7
 BLUE = (51,153,255)
 BLACK = (0,0,0)
+YELLOW = (255,255,0)
+RED = (255,0,0)
 #------------------------------------------------------------------------------------------------------------------------------------------
 
 #MARK: FUNCITIONS
@@ -71,6 +74,7 @@ def winning_move(board,piece):
                 return True
 
 pygame.init()
+myfont = pygame.font.SysFont("monospace",75)
 SQUARESIZE = 100
 width = COLUMN_COUNT * SQUARESIZE
 height = (ROW_COUNT+1) * SQUARESIZE
@@ -83,13 +87,23 @@ def draw_board(board):
     for c in range(COLUMN_COUNT):
         for r in range(ROW_COUNT):
             pygame.draw.rect(screen,BLUE,(c*SQUARESIZE, r*SQUARESIZE+SQUARESIZE, SQUARESIZE,SQUARESIZE))
-            pygame.draw.circle(screen,BLACK,(c*SQUARESIZE+SQUARESIZE/2, r*SQUARESIZE+SQUARESIZE+SQUARESIZE/2),RADIUS)
+            pygame.draw.circle(screen,BLACK,(int(c*SQUARESIZE+SQUARESIZE/2), int(r*SQUARESIZE+SQUARESIZE+SQUARESIZE/2)),RADIUS)
+    
+    for c in range(COLUMN_COUNT):
+        for r in range(ROW_COUNT):
+            if board[r][c] == 1:
+                pygame.draw.circle(screen,RED,(int(c*SQUARESIZE+SQUARESIZE/2), height-int(r*SQUARESIZE+SQUARESIZE/2)),RADIUS)
+            elif board[r][c] == 2:
+                pygame.draw.circle(screen,YELLOW,(int(c*SQUARESIZE+SQUARESIZE/2),height-int(r*SQUARESIZE+SQUARESIZE/2)),RADIUS)
+    pygame.display.update()
             
 
 #------------------------------------------------------------------------------------------------------------------------------------------------
 
 #MARK:- RUN
 def run():
+    SQUARESIZE = 100
+    width = COLUMN_COUNT * SQUARESIZE
     board = create_board()
     game_over = False
     turn = 0
@@ -106,39 +120,72 @@ def run():
             if event.type == pygame.QUIT:
                 sys.exit()
 
+            if event.type == pygame.MOUSEMOTION:
+                pygame.draw.rect(screen,BLACK,(0,0, width,SQUARESIZE))
+                posX= event.pos[0]
+
+                if turn == 0:
+                    pygame.draw.circle(screen,RED,(posX,int(SQUARESIZE/2)),RADIUS)
+                    pygame.display.update()
+                else:
+                    pygame.draw.circle(screen,YELLOW,(posX,int(SQUARESIZE/2)),RADIUS)
+                    pygame.display.update()
+
+
             if event.type == pygame.MOUSEBUTTONDOWN:
-                print(event.pos)
                 
                 #Turno jugador 1
                 if turn == 0:
                     posX = event.pos[0]
+
                     col = int(math.floor(posX/SQUARESIZE))
                     if is_valid_location(board,col):
                         row = get_next_open_row(board,col)
                         drop_piece(board,row,col,1)
-                        if(winning_move(board,1)):
-                            print("jUGADOR 1 GANO")
-                            game_over = True
+                        
 
+                        if(winning_move(board,1)):
+                            pygame.draw.rect(screen,BLACK,(0,0, width,SQUARESIZE))
+                            label = myfont.render("IA WON",1,RED)
+                            screen.blit(label,(40,10))
+                            game_over = True
+                    print("*"*8)
                     print_board(board)
+                    draw_board(board)                  
                     turn +=1
+                    if game_over:
+                        pygame.time.wait(3000)
+
+
+                        
 
 
                 #Turno jugador 2
                 else:
+
                     posX=event.pos[0]
                     col = int(math.floor(posX/SQUARESIZE))
 
                     if is_valid_location(board,col):
                         row = get_next_open_row(board,col)
                         drop_piece(board,row,col,2)
+                        
                         if(winning_move(board,2)):
-                            print("jUGADOR 2 GANO")
+                            pygame.draw.rect(screen,BLACK,(0,0, width,SQUARESIZE))
+                            label = myfont.render("You WIN",1,YELLOW)
+                            screen.blit(label,(40,10))
                             game_over = True
+                            
+                            
             
                     print_board(board)
+                    draw_board(board)
                     turn +=1
                     turn = turn %2
+                    if game_over:
+                        pygame.time.wait(3000)
+
+                    
         
             
 
