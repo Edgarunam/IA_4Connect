@@ -1,14 +1,18 @@
 #MARK: - IMPORTS
+from lib2to3 import pygram
+from re import S
 from xmlrpc.client import Boolean
 import pygame
 import numpy as np
+import sys
 
 #-----------------------------------------------------------------------------------------------------------------------------------------
 
 #MARK: - CONSTANTS
 ROW_COUNT = 6
 COLUMN_COUNT = 7
-
+BLUE = (51,153,255)
+BLACK = (0,0,0)
 #------------------------------------------------------------------------------------------------------------------------------------------
 
 #MARK: FUNCITIONS
@@ -65,6 +69,22 @@ def winning_move(board,piece):
             if board[r][c]==piece and board[r-1][c+1]==piece and board[r-2][c+2] == piece and board [r-3][c+3]== piece:
                 return True
 
+pygame.init()
+SQUARESIZE = 100
+width = COLUMN_COUNT * SQUARESIZE
+height = (ROW_COUNT+1) * SQUARESIZE
+
+size = (width,height)
+RADIUS = int(SQUARESIZE/2 -5)
+screen = pygame.display.set_mode(size)
+
+def draw_board(board):
+    for c in range(COLUMN_COUNT):
+        for r in range(ROW_COUNT):
+            pygame.draw.rect(screen,BLUE,(c*SQUARESIZE, r*SQUARESIZE+SQUARESIZE, SQUARESIZE,SQUARESIZE))
+            pygame.draw.circle(screen,BLACK,(c*SQUARESIZE+SQUARESIZE/2, r*SQUARESIZE+SQUARESIZE+SQUARESIZE/2),RADIUS)
+            
+
 #------------------------------------------------------------------------------------------------------------------------------------------------
 
 #MARK:- RUN
@@ -72,41 +92,51 @@ def run():
     board = create_board()
     game_over = False
     turn = 0
+    draw_board(board)
+    pygame.display.update()
+
+
     print(board)
     
 
     while not game_over:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                print(event.pos)
+                pass
+                # #Turno jugador 1
+                # if turn == 0:
+                #     col = int(input('Jugador 1 indique su jugada: '))
+                #     if is_valid_location(board,col):
+                #         row = get_next_open_row(board,col)
+                #         drop_piece(board,row,col,1)
+                #         if(winning_move(board,1)):
+                #             print("jUGADOR 1 GANO")
+                #             game_over = True
+
+                #     print_board(board)
+                #     turn +=1
+
+
+                # #Turno jugador 2
+                # else:
+                #     col = int(input('Jugador 2 indique su jugada: '))
+
+                #     if is_valid_location(board,col):
+                #         row = get_next_open_row(board,col)
+                #         drop_piece(board,row,col,2)
+                #         if(winning_move(board,2)):
+                #             print("jUGADOR 2 GANO")
+                #             game_over = True
+            
+                #     print_board(board)
+                #     turn +=1
+                #     turn = turn %2
         
-        #Turno jugador 1
-        if turn == 0:
-            col = int(input('Jugador 1 indique su jugada: '))
-            if is_valid_location(board,col):
-                row = get_next_open_row(board,col)
-                drop_piece(board,row,col,1)
-                if(winning_move(board,1)):
-                    print("jUGADOR 1 GANO")
-                    game_over = True
-
-            print_board(board)
-            turn +=1
-            
-           
-
-
-        #Turno jugador 2
-        else:
-            col = int(input('Jugador 2 indique su jugada: '))
-
-            if is_valid_location(board,col):
-                row = get_next_open_row(board,col)
-                drop_piece(board,row,col,2)
-                if(winning_move(board,2)):
-                    print("jUGADOR 2 GANO")
-                    game_over = True
-            
-            print_board(board)
-            turn +=1
-            turn = turn %2
             
 
 #-----------------------------------------------------------------------------------------------------------------------------------------
