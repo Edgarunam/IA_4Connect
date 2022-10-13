@@ -1,13 +1,11 @@
 #MARK: - IMPORTS
-from ast import With
-from lib2to3 import pygram
-from re import S
 from xmlrpc.client import Boolean
 import pygame
 import numpy as np
 import math
 import sys
-
+import random
+import time
 #-----------------------------------------------------------------------------------------------------------------------------------------
 
 #MARK: - CONSTANTS
@@ -17,6 +15,9 @@ BLUE = (51,153,255)
 BLACK = (0,0,0)
 YELLOW = (255,255,0)
 RED = (255,0,0)
+
+PLAYER:int =0
+AI:int = 1
 #------------------------------------------------------------------------------------------------------------------------------------------
 
 #MARK: FUNCITIONS
@@ -135,7 +136,7 @@ def run():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 
                 #Turno jugador 1
-                if turn == 0:
+                if turn == PLAYER:
                     posX = event.pos[0]
 
                     col = int(math.floor(posX/SQUARESIZE))
@@ -146,7 +147,7 @@ def run():
 
                         if(winning_move(board,1)):
                             pygame.draw.rect(screen,BLACK,(0,0, width,SQUARESIZE))
-                            label = myfont.render("IA WON",1,RED)
+                            label = myfont.render("YOU WIN",1,RED)
                             screen.blit(label,(40,10))
                             game_over = True
                     print("*"*8)
@@ -161,29 +162,31 @@ def run():
 
 
                 #Turno jugador 2
-                else:
+        if turn ==AI and not game_over:
 
-                    posX=event.pos[0]
-                    col = int(math.floor(posX/SQUARESIZE))
+                    
+            col = random.randint(0,COLUMN_COUNT-1)
+            time.sleep(0.2)
 
-                    if is_valid_location(board,col):
-                        row = get_next_open_row(board,col)
-                        drop_piece(board,row,col,2)
+            if is_valid_location(board,col):
+                row = get_next_open_row(board,col)
+                drop_piece(board,row,col,2)
                         
-                        if(winning_move(board,2)):
-                            pygame.draw.rect(screen,BLACK,(0,0, width,SQUARESIZE))
-                            label = myfont.render("You WIN",1,YELLOW)
-                            screen.blit(label,(40,10))
-                            game_over = True
+                if(winning_move(board,2)):
+                    pygame.draw.rect(screen,BLACK,(0,0, width,SQUARESIZE))
+                    label = myfont.render("IA WON",1,YELLOW)
+                    screen.blit(label,(40,10))
+                    game_over = True
                             
                             
             
-                    print_board(board)
-                    draw_board(board)
-                    turn +=1
-                    turn = turn %2
-                    if game_over:
-                        pygame.time.wait(3000)
+            print_board(board)
+            draw_board(board)
+            turn +=1
+            turn = turn %2
+            if game_over:
+                pygame.time.wait(3000)
+                
 
                     
         
