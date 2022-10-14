@@ -144,7 +144,7 @@ def score_position(board,piece):
 def is_terminal_node(board):
     return winning_move(board,PLAYER_PIECE) or winning_move(board,AI_PIECE) or (len(get_valid_locations(board))==0)
 
-def minimax(board,depth,maximizingPlayer):
+def minimax(board,depth,maximizingPlayer,alpha,beta):
     valid_location = get_valid_locations(board)
     is_terminal = is_terminal_node(board)
     if depth == 0 or is_terminal:
@@ -165,10 +165,13 @@ def minimax(board,depth,maximizingPlayer):
             row = get_next_open_row(board,col)
             b_copy = board.copy()
             drop_piece(b_copy,row,col,AI_PIECE)
-            new_score = minimax(b_copy,depth-1,False)[1]
+            new_score = minimax(b_copy,depth-1,False,-math.inf,math.inf)[1]
             if new_score > value:
                 value = new_score
                 column = col
+                alpha = max(alpha,value)
+                if alpha>=beta:
+                    break
 
         return column,value
     
@@ -179,10 +182,13 @@ def minimax(board,depth,maximizingPlayer):
             row = get_next_open_row(board,col)
             b_copy = board.copy()
             drop_piece(b_copy,row,col,PLAYER_PIECE)
-            new_score = minimax(b_copy,depth-1,True)[1]
+            new_score = minimax(b_copy,depth-1,True,-math.inf,math.inf)[1]
             if new_score < value:
                 value = new_score
                 column = col
+                beta = min(beta,value)
+                if beta <= alpha:
+                    break
         return column,value
             
 
@@ -311,7 +317,7 @@ def run():
                     
             #col = random.randint(0,COLUMN_COUNT-1)
             #col = pick_best_move(board,AI_PIECE)
-            col,minimax_score = minimax(board,4,True)
+            col,minimax_score = minimax(board,4,True,-math.inf,math.inf)
             time.sleep(0.2)
 
             if is_valid_location(board,col):
