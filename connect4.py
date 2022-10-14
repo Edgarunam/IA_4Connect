@@ -1,4 +1,5 @@
 #MARK: - IMPORTS
+import re
 from xmlrpc.client import Boolean
 import pygame
 import numpy as np
@@ -73,16 +74,13 @@ def winning_move(board,piece):
 
     #Diagonal Check (-) #Horizontal checl
     for c in range (COLUMN_COUNT-3):
-        for r in range(ROW_COUNT):
-            if board[r][c] == piece and board[r][c+1]==piece and board[r][c+2]== piece and board[r][c+3]== piece:
+        for r in range(ROW_COUNT-3):
+            if board[r+3][c] == piece and board[r+2][c+1]==piece and board[r+1][c+2]== piece and board[r][c+3]== piece:
                 return True
 
 
 
 ###HEURISTC FUNCTION###
-
-
-
 def evaluate_window(window,piece):
     score = 0
     opp_piece = PLAYER_PIECE
@@ -141,8 +139,53 @@ def score_position(board,piece):
     return score
 
 
-def minomax(board,depth,maximizingPlayer):
-    pass
+#minimax Algorithm
+
+def is_terminal_node(board):
+    return winning_move(board,PLAYER_PIECE) or winning_move(board,AI_PIECE) or (len(get_valid_locations(board))==0)
+
+def minimax(board,depth,maximizingPlayer):
+    valid_location = get_valid_locations(board)
+    is_terminal = is_terminal_node(board)
+    if depth == 0 or is_terminal:
+        if is_terminal:
+            if winning_move(board, AI_PIECE):
+                return (None,1000000)
+            elif winning_move(board, PLAYER_PIECE):
+                return (None,-1000000)
+            else:
+                return (None,0)
+        else:
+            return (None,score_position(board,AI_PIECE))
+
+    if maximizingPlayer:
+        value = -math.inf
+        column = random.choice(valid_location)
+        for col in valid_location:
+            row = get_next_open_row(board,col)
+            b_copy = board.copy()
+            drop_piece(b_copy,row,col,AI_PIECE)
+            new_score = minimax(b_copy,depth-1,False)[1]
+            if new_score > value:
+                value = new_score
+                column = col
+
+        return column,value
+    
+    else:
+        value = math.inf
+        column = random.choice(valid_location)
+        for col in valid_location:
+            row = get_next_open_row(board,col)
+            b_copy = board.copy()
+            drop_piece(b_copy,row,col,PLAYER_PIECE)
+            new_score = minimax(b_copy,depth-1,True)[1]
+            if new_score < value:
+                value = new_score
+                column = col
+        return column,value
+            
+
 
 
 def get_valid_locations(board):
@@ -267,7 +310,8 @@ def run():
 
                     
             #col = random.randint(0,COLUMN_COUNT-1)
-            col = pick_best_move(board,AI_PIECE)
+            #col = pick_best_move(board,AI_PIECE)
+            col,minimax_score = minimax(board,4,True)
             time.sleep(0.2)
 
             if is_valid_location(board,col):
