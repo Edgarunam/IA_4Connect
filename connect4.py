@@ -1,6 +1,4 @@
 #MARK: - IMPORTS
-from cgi import print_arguments
-from itertools import count
 from xmlrpc.client import Boolean
 import pygame
 import numpy as np
@@ -79,27 +77,6 @@ def winning_move(board,piece):
             if board[r][c] == piece and board[r][c+1]==piece and board[r][c+2]== piece and board[r][c+3]== piece:
                 return True
 
-    #Vertical Check
-
-    for r in range (ROW_COUNT-3):
-        for c in range (COLUMN_COUNT):
-            if board[r][c]==piece and board[r+1][c]==piece and board[r+2][c] == piece and board [r+3][c]== piece:
-                return True
-
-    #Diagonal Check (+)
-
-    for r in range (ROW_COUNT-3):
-        for c in range (COLUMN_COUNT-3):
-            if board[r][c]==piece and board[r+1][c+1]==piece and board[r+2][c+2] == piece and board [r+3][c+3]== piece:
-                return True
-
-    #Diagonal Check (-)
-
-    for r in range (ROW_COUNT-3):
-        for c in range (COLUMN_COUNT-3):
-            if board[r+3][c]==piece and board[r+2][c+1]==piece and board[r+1][c+2] == piece and board [r][c+3]== piece:
-                return True
-
 
 
 ###HEURISTC FUNCTION###
@@ -164,9 +141,13 @@ def score_position(board,piece):
     return score
 
 
+def minomax(board,depth,maximizingPlayer):
+    pass
+
+
 def get_valid_locations(board):
     valid_locations = []
-    for c in range(COLUMN_COUNT-1):
+    for c in range(COLUMN_COUNT):
         if is_valid_location(board,c):
             valid_locations.append(c)
     return valid_locations
